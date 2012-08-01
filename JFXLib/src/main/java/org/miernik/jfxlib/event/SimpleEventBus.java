@@ -4,6 +4,7 @@
  */
 package org.miernik.jfxlib.event;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -38,15 +39,16 @@ public class SimpleEventBus implements EventBus {
 			for (int i = 0; i < types.length; i++) {
 				ParameterizedType type = (ParameterizedType) types[i];
 				if (EventListener.class.equals(type.getRawType()))
-					return type;				
+					return type;
 			}
 		}
 		throw new IllegalStateException("cannot find EventListener interface");
 	}
-	
-	protected final <T extends EventListener<? extends Event>> Class<?> getEventType(T obj) {
+
+	protected final <T extends EventListener<? extends Event>> Class<?> getEventType(
+			T obj) {
 		ParameterizedType type = findEventListenerType(obj.getClass());
-		return (Class<?>)type.getActualTypeArguments()[0];
+		return (Class<?>) type.getActualTypeArguments()[0];
 	}
 
 	@Override
@@ -63,30 +65,46 @@ public class SimpleEventBus implements EventBus {
 	}
 
 	@Override
-    public void fireEvent(Event event) {
-        if (listenersMap.containsKey(event.getClass())) {
-            List<EventListener<? extends Event>> listeners = listenersMap.get(event.getClass());
-            for (Iterator<EventListener<? extends Event>> it = listeners.iterator(); it.hasNext();) {
-                EventListener<? extends Event> eventListener = it.next();
-                
-                /*
-                // check listener event type to event type
-        		Class<?> listenerEventClass = getEventType(eventListener);
-        		if (!listenerEventClass.equals(event.getClass())) {
-        			throw new IllegalStateException("wrong event type was connected to listener");
-        		}
-        		*/
-                
-        		// run method of listener by reflection
-        		try {
-        			Method m = eventListener.getClass().getMethod("performed", new Class[] {event.getClass()});
-        			m.invoke(eventListener, new Object[] {event});
-        		} catch (Exception ex) {
-        			throw new IllegalStateException("cannot invoke method: performed() of the listener", ex);
-        		}        		
-            }
-        }
-    }
+	public void fireEvent(Event event) {
+		if (listenersMap.containsKey(event.getClass())) {
+			List<EventListener<? extends Event>> listeners = listenersMap
+					.get(event.getClass());
+			for (Iterator<EventListener<? extends Event>> it = listeners
+					.iterator(); it.hasNext();) {
+				EventListener<? extends Event> eventListener = it.next();
+
+				/*
+				 * // check listener event type to event type Class<?>
+				 * listenerEventClass = getEventType(eventListener); if
+				 * (!listenerEventClass.equals(event.getClass())) { throw new
+				 * IllegalStateException
+				 * ("wrong event type was connected to listener"); }
+				 */
+
+				// run method of listener by reflection
+				Method m = null;
+				try {
+					m = eventListener.getClass().getMethod("performed",
+							new Class[] { event.getClass() });
+
+				} catch (NoSuchMethodException | SecurityException ex) {
+					throw new IllegalStateException(
+							"cannot find method: performed() of the listener",
+							ex);
+				}
+
+				try {
+					m.invoke(eventListener, new Object[] { event });
+				} catch (IllegalAccessException | IllegalArgumentException
+						| InvocationTargetException ex) {
+					throw new IllegalStateException(
+							"error while invoke method: performed() of the listener",
+							ex);
+				}
+
+			}
+		}
+	}
 
 	@Override
 	public void removeListener(EventListener<? extends Event> listener) {

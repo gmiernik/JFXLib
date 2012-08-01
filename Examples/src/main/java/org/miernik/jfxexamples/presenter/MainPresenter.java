@@ -1,0 +1,63 @@
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package org.miernik.jfxexamples.presenter;
+
+import java.net.URL;
+import java.util.ResourceBundle;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
+import javafx.fxml.FXML;
+import javafx.fxml.Initializable;
+import javafx.scene.control.MenuItem;
+import javafx.scene.layout.AnchorPane;
+import javafx.stage.Stage;
+import org.miernik.jfxexamples.ExampleService;
+import org.miernik.jfxlib.presenter.AbstractMainPresenter;
+
+/**
+ *
+ * @author Miernik
+ */
+public class MainPresenter extends AbstractMainPresenter<ExampleService> implements Initializable {
+
+    @FXML
+    private MenuItem menuClose;
+    @FXML
+    private MenuItem menuAbout;
+    @FXML
+    private AnchorPane mainContent;
+    private Stage stage;
+
+
+    @Override
+    public void setMainView(Stage stage) {
+        super.setMainView(stage);
+        this.stage = stage;
+    }
+
+    protected Stage getStage() {
+    	//TODO: move the method to AbstractMainPresenter
+        return stage;
+    }
+
+    @Override
+    public void initialize(URL url, ResourceBundle rb) {
+        menuClose.setOnAction(new EventHandler<ActionEvent>() {
+
+            @Override
+            public void handle(ActionEvent t) {
+                getStage().close();
+            }
+        });
+        menuAbout.setOnAction(new EventHandler<ActionEvent>() {
+
+            @Override
+            public void handle(ActionEvent t) {
+                fireAction("About");
+            }
+        });
+    }    
+    
+}
