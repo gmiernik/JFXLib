@@ -14,6 +14,7 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 import org.miernik.jfxexamples.ExampleService;
+import org.miernik.jfxlib.dialogs.MessageBox;
 import org.miernik.jfxlib.presenter.AbstractMainPresenter;
 
 /**
@@ -26,6 +27,10 @@ public class MainPresenter extends AbstractMainPresenter<ExampleService> impleme
     private MenuItem menuClose;
     @FXML
     private MenuItem menuAbout;
+    @FXML
+    private MenuItem menuMessage;
+    @FXML
+    private MenuItem menuNew;
     @FXML
     private AnchorPane mainContent;
     private Stage stage;
@@ -58,6 +63,21 @@ public class MainPresenter extends AbstractMainPresenter<ExampleService> impleme
                 fireAction("About");
             }
         });
+        menuMessage.setOnAction(new EventHandler<ActionEvent>() {
+
+			@Override
+			public void handle(ActionEvent arg0) {
+				MessageBox msg = new MessageBox("MessageBox", "Hello world!");
+				msg.show();
+			}
+		});
+        menuNew.setOnAction(new EventHandler<ActionEvent>() {
+			
+			@Override
+			public void handle(ActionEvent arg0) {
+				fireAction("NewInfo");
+			}
+		});
     }    
     
 }

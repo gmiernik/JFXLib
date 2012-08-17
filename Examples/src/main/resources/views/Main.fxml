@@ -16,6 +16,8 @@
             <menus>
                 <Menu text="%MenuFile">
                     <items>
+                    	<MenuItem fx:id="menuMessage" text="%MenuMessage" />
+                    	<MenuItem fx:id="menuNew" text="%MenuNew" />
                         <MenuItem fx:id="menuClose" text="%MenuClose" />
                     </items>
                 </Menu>

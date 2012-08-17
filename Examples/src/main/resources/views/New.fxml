@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.collections.*?>
+<?import java.lang.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.control.cell.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.shape.*?>
+<?import javafx.scene.text.*?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.Button?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox xmlns:fx="http://javafx.com/fxml"
+	fx:controller="org.miernik.jfxexamples.presenter.NewPresenter">
+	<padding>
+		<Insets top="8" bottom="8" left="8" right="8" />
+	</padding>
+	<children>
+		<HBox>
+			<VBox.margin>
+				<Insets top="8" bottom="8" left="8" right="8" />
+			</VBox.margin>
+			<children>
+				<Label text="%InfoLabel" />
+				<TextField fx:id="InfoField">
+					<HBox.margin>
+						<Insets left="5" />
+					</HBox.margin>
+				</TextField>
+			</children>
+		</HBox>
+		<HBox alignment="CENTER_RIGHT">
+			<VBox.margin>
+				<Insets top="8" bottom="8" left="8" right="8" />
+			</VBox.margin>
+			<children>
+				<Button text="%ButtonOk" fx:id="buttonOk" />
+			</children>
+		</HBox>
+	</children>
+</VBox>
