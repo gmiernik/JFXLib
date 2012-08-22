@@ -94,6 +94,7 @@ public class SimpleEventBus implements EventBus {
 				}
 
 				try {
+					m.setAccessible(true); // added to allow invoke perform() out of default package
 					m.invoke(eventListener, new Object[] { event });
 				} catch (IllegalAccessException | IllegalArgumentException
 						| InvocationTargetException ex) {

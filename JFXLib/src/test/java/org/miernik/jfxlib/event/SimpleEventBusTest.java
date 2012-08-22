@@ -311,5 +311,28 @@ public class SimpleEventBusTest {
 		// check
 		assertTrue(listener.flag);
 	}
+	
+	@Test
+	public void testEventBus11() {
+		EventBus bus = new SimpleEventBus();
+		EventListener<Event> l1 = new EventListener<Event>() {
+
+			@Override
+			public void performed(Event arg0) {
+			}
+		};
+		EventListener<TestEvent1> l2 = new EventListener<TestEvent1>() {
+
+			@Override
+			public void performed(TestEvent1 arg0) {
+			}
+		};
+
+		bus.addListener(l1);
+		bus.addListener(l2);
+		bus.fireEvent(new Event() {
+		});
+		bus.fireEvent(new TestEvent1());
+	}
 
 }
