@@ -8,7 +8,7 @@
     <version>1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
-    <name>JFXExamples</name>
+    <name>Examples</name>
     <url>http://jfxexamples.miernik.org</url>
 
     <properties>

@@ -10,17 +10,22 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 public class MessageBox {
 	
-	private Stage stage;
+	private final Stage stage;
+	
+	protected Stage getStage() {
+		return stage;
+	}
 	
 	public MessageBox(String title, String message) {
 		stage = new Stage();
 		stage.setTitle(title);
 		stage.setScene(new Scene(buildLayout(message)));
-		//TODO: add modal dialog to the class
+		stage.initModality(Modality.APPLICATION_MODAL);
 	}
 	
 	private Parent buildLayout(String message) {

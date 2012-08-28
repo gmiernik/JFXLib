@@ -10,16 +10,12 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 
 import org.miernik.jfxexamples.ExampleService;
-import org.miernik.jfxlib.presenter.DialogPresenter;
+import org.miernik.jfxlib.presenter.ModalWindowPresenter;
 
-public class NewPresenter extends DialogPresenter<ExampleService> implements Initializable {
+public class NewPresenter extends ModalWindowPresenter<ExampleService> implements Initializable {
 
 	@FXML private Button buttonOk;
 	
-	public NewPresenter() {
-		super("New info", true);		
-	}
-
 	@Override
 	public void initialize(URL arg0, ResourceBundle arg1) {
 		buttonOk.setOnAction(new EventHandler<ActionEvent>() {

@@ -8,6 +8,7 @@ import javafx.stage.Stage;
 
 import org.miernik.jfxexamples.presenter.MainPresenter;
 import org.miernik.jfxexamples.presenter.NewPresenter;
+import org.miernik.jfxexamples.presenter.SampleWindowPresenter;
 import org.miernik.jfxlib.MVPApplication;
 import org.miernik.jfxlib.presenter.AbstractMainPresenter;
 
@@ -24,6 +25,7 @@ public class App extends MVPApplication<ExampleService> {
     }
     
     private MainPresenter mainPresenter;
+    private SampleWindowPresenter sampleWindowPresenter;
     private ExampleService service = new ExampleService();
         
     @Override
@@ -48,6 +50,18 @@ public class App extends MVPApplication<ExampleService> {
 	
 	public void actionNewInfo() {
 		NewPresenter pres = (NewPresenter) load("New", true);
-		pres.showDialog();
+		pres.show();
 	}
+	
+	public void actionOpenSampleWindow() {
+		getSampleWindowPresenter().show();
+	}
+
+	public SampleWindowPresenter getSampleWindowPresenter() {
+		if (sampleWindowPresenter==null) {
+			sampleWindowPresenter = (SampleWindowPresenter) load("SampleWindow");
+		}
+		return sampleWindowPresenter;
+	}
+
 }

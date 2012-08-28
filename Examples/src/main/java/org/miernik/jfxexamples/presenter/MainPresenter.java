@@ -34,6 +34,7 @@ public class MainPresenter extends AbstractMainPresenter<ExampleService> impleme
     @FXML
     private AnchorPane mainContent;
     private Stage stage;
+    @FXML private MenuItem sampleWindow;
 
 
     @Override
@@ -49,6 +50,13 @@ public class MainPresenter extends AbstractMainPresenter<ExampleService> impleme
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
+    	sampleWindow.setOnAction(new EventHandler<ActionEvent>() {
+			
+			@Override
+			public void handle(ActionEvent arg0) {
+				fireAction("OpenSampleWindow");
+			}
+		});
         menuClose.setOnAction(new EventHandler<ActionEvent>() {
 
             @Override

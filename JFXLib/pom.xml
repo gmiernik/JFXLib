@@ -5,7 +5,7 @@
 
 	<groupId>org.miernik</groupId>
 	<artifactId>jfxlib</artifactId>
-	<version>1.0-SNAPSHOT</version>
+	<version>0.1-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
 	<name>JFXLib</name>
@@ -27,6 +27,13 @@
 			<groupId>com.oracle</groupId>
 			<artifactId>javafx</artifactId>
 			<version>2.2</version>
+		</dependency>
+		<dependency>
+			<!-- project: https://github.com/jhalterman/concurrentunit -->
+			<groupId>org.jodah</groupId>
+			<artifactId>concurrentunit-junit</artifactId>
+			<version>0.2.1-SNAPSHOT</version>
+			<scope>test</scope>
 		</dependency>
 	</dependencies>
 	<build>

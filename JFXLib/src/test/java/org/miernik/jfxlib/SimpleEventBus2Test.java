@@ -13,6 +13,7 @@ import org.miernik.jfxlib.event.TestEvent1;
 /**
  * Unit test for simple App.
  */
+@SuppressWarnings("unused")
 public class SimpleEventBus2Test {
 	
 	@Test
