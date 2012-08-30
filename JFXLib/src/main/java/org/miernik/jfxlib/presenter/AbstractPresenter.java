@@ -66,6 +66,5 @@ public abstract class AbstractPresenter<T extends Service> implements Presenter 
     }
 
     @Override
-    public void show() {
-    }
+    public abstract void show();
 }

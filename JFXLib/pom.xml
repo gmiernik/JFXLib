@@ -9,7 +9,7 @@
 	<packaging>jar</packaging>
 
 	<name>JFXLib</name>
-	<url>http://jfxlib.miernik.org</url>
+	<url>https://github.com/gmiernik/JFXLib</url>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

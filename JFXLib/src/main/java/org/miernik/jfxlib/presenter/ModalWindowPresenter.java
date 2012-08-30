@@ -14,10 +14,14 @@ import org.miernik.jfxlib.Service;
  */
 public abstract class ModalWindowPresenter<T extends Service> extends WindowPresenter<T> {
 
+	private Stage stage;
+	
 	@Override
 	public Stage getStage() {
-		Stage s = super.getStage();
-		s.initModality(Modality.APPLICATION_MODAL);
-		return s;
+		if (stage==null) {
+			stage = super.getStage();
+			stage.initModality(Modality.APPLICATION_MODAL);
+		}
+		return stage;
 	}
 }

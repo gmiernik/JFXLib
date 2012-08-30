@@ -34,6 +34,5 @@ public abstract class WindowPresenter<T extends Service> extends AbstractPresent
 	@Override
 	public void show() {
 		getStage().show();
-		super.show();
 	}
 }

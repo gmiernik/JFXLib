@@ -19,6 +19,12 @@ public class TestPresenter extends AbstractPresenter<Service> implements Initial
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-    }    
+    }
+
+	@Override
+	public void show() {
+		// TODO Auto-generated method stub
+		
+	}    
     
 }

@@ -31,4 +31,24 @@ public class ModalWindowPresenterTest extends ConcurrentTestCase {
 		});
 		threadWait(1000);
 	}
+	
+	@Test
+	public void testOnceModality() throws Throwable {
+		Platform.runLater(new Runnable() {
+			public void run() {
+				final ModalWindowPresenter<Service> p = new ModalWindowPresenter<Service>() {
+				};
+				p.setView(new AnchorPane());
+				
+				p.show();
+				p.getStage().close();
+				p.show();
+
+				threadAssertNotNull(p.getStage());
+				threadAssertEquals(Modality.APPLICATION_MODAL, p.getStage().getModality());
+				resume();
+			}
+		});
+		threadWait(1000);
+	}
 }

@@ -86,6 +86,12 @@ public class MainPresenter extends AbstractMainPresenter<ExampleService> impleme
 				fireAction("NewInfo");
 			}
 		});
-    }    
+    }
+
+	@Override
+	public void show() {
+		// TODO Auto-generated method stub
+		
+	}    
     
 }
