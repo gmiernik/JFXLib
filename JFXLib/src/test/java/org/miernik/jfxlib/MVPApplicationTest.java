@@ -9,13 +9,14 @@ import java.net.URL;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
+import javafx.scene.Parent;
 import javafx.stage.Stage;
 import static org.junit.Assert.*;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.miernik.jfxlib.event.SimpleActionEvent;
-import org.miernik.jfxlib.presenter.AbstractMainPresenter;
+import org.miernik.jfxlib.presenter.BaseMainPresenter;
 
 /**
  * 
@@ -39,11 +40,12 @@ public class MVPApplicationTest {
 
 		@Override
 		public Service getService() {
-			return null;
+			return new Service() {
+			};
 		}
 
 		@Override
-		public AbstractMainPresenter<?> getMainPresenter() {
+		public BaseMainPresenter<?> getMainPresenter() {
 			return null;
 		}
 
@@ -68,22 +70,7 @@ public class MVPApplicationTest {
 	}
 
 	@Test
-	public void testLoad() {
-		final TestApp app = new TestApp();
-		final String viewName = "TestView";
-
-		URL path = app.getClass().getResource("/views/"+viewName +".fxml");
-		assertNotNull(path);
-		File file = new File(path.getFile());
-		assertTrue(file.exists());
-
-		TestPresenter result = app.load(viewName);
-		assertNotNull(result);
-
-	}
-
-	@Test
-	public void testLoadWithBundle() {
+	public void testLoadWithResource() throws Exception {
 		final TestApp app = new TestApp();
 		final String viewName = "TestView";
 		Locale.setDefault(Locale.ROOT);
@@ -93,10 +80,31 @@ public class MVPApplicationTest {
 		File file = new File(path.getFile());
 		assertTrue(file.exists());
 		
-		ResourceBundle bundle = ResourceBundle.getBundle("views." + viewName);
-		assertNotNull(bundle);
+		ResourceBundle resource = ResourceBundle.getBundle("views." + viewName);
+		assertNotNull(resource);
 
-		TestPresenter result = app.load(viewName, true);
+		TestPresenter result = app.load(TestPresenter.class, viewName, true);
 		assertNotNull(result);
+		assertNotNull(result.getResource());
 	}
+	
+	@Test
+	public void testLoad() throws Exception {
+		final TestApp app = new TestApp();
+		final String viewName = "TestView";
+
+		URL path = app.getClass().getResource("/views/"+viewName +".fxml");
+		assertNotNull(path);
+		File file = new File(path.getFile());
+		assertTrue(file.exists());
+		
+		TestPresenter result = app.load(TestPresenter.class, viewName);
+		assertNotNull(result);
+		assertEquals(TestPresenter.class, result.getClass());
+		assertNotNull(result.getView());
+		assertTrue(result.getView() instanceof Parent);
+		assertNotNull(result.testLabel);
+		assertEquals("initiated", result.testLabel.getText());
+	}
+	
 }

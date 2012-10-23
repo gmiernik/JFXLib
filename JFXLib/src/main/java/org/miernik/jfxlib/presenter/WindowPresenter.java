@@ -12,7 +12,7 @@ import org.miernik.jfxlib.Service;
  * 
  * @author Miernik
  */
-public abstract class WindowPresenter<T extends Service> extends AbstractPresenter<T> {
+public abstract class WindowPresenter<T extends Service> extends BasePresenter<T> {
 
 	private Stage stage;
 

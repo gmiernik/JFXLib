@@ -21,6 +21,12 @@ public class WindowPresenterTest extends ConcurrentTestCase {
 		Platform.runLater(new Runnable() {
 			public void run() {
 				final WindowPresenter<Service> p = new WindowPresenter<Service>() {
+
+					@Override
+					public void initialize() {
+						// TODO Auto-generated method stub
+						
+					}
 				};
 				p.setView(new AnchorPane());
 

@@ -21,6 +21,12 @@ public class ModalWindowPresenterTest extends ConcurrentTestCase {
 		Platform.runLater(new Runnable() {
 			public void run() {
 				final ModalWindowPresenter<Service> p = new ModalWindowPresenter<Service>() {
+
+					@Override
+					public void initialize() {
+						// TODO Auto-generated method stub
+						
+					}
 				};
 				p.setView(new AnchorPane());
 
@@ -37,6 +43,12 @@ public class ModalWindowPresenterTest extends ConcurrentTestCase {
 		Platform.runLater(new Runnable() {
 			public void run() {
 				final ModalWindowPresenter<Service> p = new ModalWindowPresenter<Service>() {
+
+					@Override
+					public void initialize() {
+						// TODO Auto-generated method stub
+						
+					}
 				};
 				p.setView(new AnchorPane());
 				

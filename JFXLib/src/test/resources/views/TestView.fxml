@@ -9,6 +9,6 @@
 <?import javafx.scene.shape.*?>
 <?import javafx.scene.text.*?>
 
-<AnchorPane prefHeight="100" prefWidth="100" xmlns:fx="http://javafx.com/fxml" 
-            fx:controller="org.miernik.jfxlib.TestPresenter" >
+<AnchorPane prefHeight="100" prefWidth="100" xmlns:fx="http://javafx.com/fxml" >
+            <Label fx:id="testLabel" text="test" />
 </AnchorPane>

@@ -4,27 +4,33 @@
  */
 package org.miernik.jfxlib;
 
-import java.net.URL;
-import java.util.ResourceBundle;
+import javafx.fxml.FXML;
+import javafx.scene.control.Label;
 
-import javafx.fxml.Initializable;
-
-import org.miernik.jfxlib.presenter.AbstractPresenter;
+import org.miernik.jfxlib.presenter.BasePresenter;
 
 /**
  *
  * @author Miernik
  */
-public class TestPresenter extends AbstractPresenter<Service> implements Initializable {
+public class TestPresenter extends BasePresenter<Service> {
 
-    @Override
-    public void initialize(URL url, ResourceBundle rb) {
-    }
-
+	@FXML
+	protected Label testLabel;
+	
 	@Override
 	public void show() {
 		// TODO Auto-generated method stub
 		
-	}    
+	}
+
+	@Override
+	public void initialize() {
+		testLabel.setText("initiated");
+		if (getEventBus()==null)
+			throw new IllegalStateException("EventBus object cannot be NULL");
+		if (getService()==null)
+			throw new IllegalStateException("Service object cannot be NULL");
+	}
     
 }

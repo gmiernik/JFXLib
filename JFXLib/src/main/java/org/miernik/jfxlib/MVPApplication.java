@@ -14,8 +14,8 @@ import org.miernik.jfxlib.event.EventBus;
 import org.miernik.jfxlib.event.EventListener;
 import org.miernik.jfxlib.event.SimpleActionEvent;
 import org.miernik.jfxlib.event.SimpleEventBus;
-import org.miernik.jfxlib.presenter.AbstractMainPresenter;
-import org.miernik.jfxlib.presenter.AbstractPresenter;
+import org.miernik.jfxlib.presenter.BaseMainPresenter;
+import org.miernik.jfxlib.presenter.BasePresenter;
 
 /**
  * 
@@ -32,7 +32,7 @@ public abstract class MVPApplication<S extends Service> extends Application
 
 	public abstract S getService();
 
-	public abstract AbstractMainPresenter<?> getMainPresenter();
+	public abstract BaseMainPresenter<?> getMainPresenter();
 
 	public MVPApplication() {
 		super();
@@ -57,47 +57,60 @@ public abstract class MVPApplication<S extends Service> extends Application
 		}
 	}
 
-	protected <P extends AbstractPresenter<S>> P load(String fxmlName) {
-		return load(fxmlName, false);
+	protected <P extends BasePresenter<S>> P load(Class<P> controllerClass,
+			String fxmlName) throws InstantiationException,
+			IllegalAccessException {
+		return load(controllerClass, fxmlName, false);
 	}
 
-	protected <P extends AbstractPresenter<S>> P load(String fxmlName,
-			boolean bundle) {
-		if (bundle) {
-			return load(fxmlName, ResourceBundle.getBundle("views." + fxmlName));
-		} else {
-			return load(fxmlName, null);
-		}
+	protected <P extends BasePresenter<S>> P load(Class<P> controllerClass,
+			String fxmlName, boolean loadResource)
+			throws InstantiationException, IllegalAccessException {
+		return load(controllerClass, fxmlName,
+				loadResource ? getResourceBundleOfView(fxmlName) : null);
 	}
 
 	/**
+	 * Load presenter and view object.
 	 * 
-	 * @param <S>
-	 *            type of Presenter
-	 * @param fxmlFile
-	 *            name of FXML file
-	 * @param bundle
-	 *            resource bundle including texts
-	 * @return
+	 * @param controllerClass
+	 *            presenter class
+	 * @param fxmlName
+	 *            name of view file in FXML notation
+	 * @param resource
+	 *            resource object included texts and static data
+	 * @return controller (presenter) object
+	 * @throws InstantiationException
+	 * @throws IllegalAccessException
 	 */
-	@SuppressWarnings("unchecked")
-	protected <P extends AbstractPresenter<S>> P load(String fxmlName,
-			ResourceBundle bundle) {
-		P presenter = null;
+	protected <P extends BasePresenter<S>> P load(Class<P> controllerClass,
+			String fxmlName, ResourceBundle resource) {
 		try {
+			final P controller = controllerClass.newInstance();
+			controller.setEventBus(getEventBus());
+			controller.setService(getService());
 			FXMLLoader loader = new FXMLLoader();
-			if (bundle != null) {
-				loader.setResources(bundle);
+			loader.setController(controller);
+			if (resource != null) {
+				loader.setResources(resource);
+				controller.setResource(resource);
 			}
 			loader.load(this.getClass().getResourceAsStream(
 					"/views/" + fxmlName + ".fxml"));
-			presenter = (P) loader.getController();
-			presenter.setView((Parent) loader.getRoot());
-			presenter.setService(getService());
-			presenter.setEventBus(getEventBus());
+			controller.setView((Parent) loader.getRoot());
+			return controller;
 		} catch (Exception ex) {
-			throw new RuntimeException("Unable to load FXML: " + fxmlName, ex);
+			throw new RuntimeException("Unable to load FXML: " + fxmlName
+					+ ", error: " + getFirstException(ex).getMessage(), ex);
 		}
-		return presenter;
 	}
+
+	private Throwable getFirstException(Throwable ex) {
+		return ex.getCause() == null ? ex : getFirstException(ex.getCause());
+	}
+
+	protected ResourceBundle getResourceBundleOfView(String fxmlName) {
+		return ResourceBundle.getBundle("views." + fxmlName);
+	}
+
 }

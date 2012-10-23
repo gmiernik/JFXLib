@@ -14,7 +14,7 @@ import org.miernik.jfxlib.Service;
  *
  * @author Miernik
  */
-public abstract class AbstractMainPresenter<T extends Service> extends AbstractPresenter<T> {
+public abstract class BaseMainPresenter<T extends Service> extends BasePresenter<T> {
     
     public void setMainView(Stage stage) {
         stage.setScene(new Scene(this.getView()));

@@ -26,6 +26,5 @@ public interface Presenter {
     /**
      * Calling every time when view is closed
      */
-    void dispose();
-        
+    void dispose();        
 }
