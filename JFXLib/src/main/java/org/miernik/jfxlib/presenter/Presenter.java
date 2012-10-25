@@ -19,12 +19,17 @@ public interface Presenter {
     Parent getView();
 
     /**
-     * Calling every time when view is shown
+     * Show view of the presenter
      */
     void show();
     
     /**
-     * Calling every time when view is closed
+     * Hide view of the presenter
+     */
+    void hide();
+    
+    /**
+     * Call to clear and remove unnecessary data
      */
     void dispose();        
 }

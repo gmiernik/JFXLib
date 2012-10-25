@@ -30,9 +30,4 @@ public abstract class WindowPresenter<T extends Service> extends BasePresenter<T
 		}
 		return stage;
 	}
-
-	@Override
-	public void show() {
-		getStage().show();
-	}
 }

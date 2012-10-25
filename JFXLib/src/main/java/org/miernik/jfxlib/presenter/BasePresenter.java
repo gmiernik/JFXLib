@@ -6,6 +6,9 @@ package org.miernik.jfxlib.presenter;
 
 import java.util.ResourceBundle;
 import javafx.scene.Parent;
+import javafx.stage.Stage;
+import javafx.stage.Window;
+
 import org.miernik.jfxlib.Service;
 import org.miernik.jfxlib.event.EventBus;
 import org.miernik.jfxlib.event.SimpleActionEvent;
@@ -20,6 +23,7 @@ public abstract class BasePresenter<T extends Service> implements Presenter {
 	private T service;
 	private EventBus eventBus;
 	private ResourceBundle resource;
+	private Stage stage;
 
 	public void setResource(ResourceBundle resource) {
 		this.resource = resource;
@@ -78,7 +82,55 @@ public abstract class BasePresenter<T extends Service> implements Presenter {
 	}
 
 	@Override
-	public abstract void show();
+	public void hide() {
+		if (getStage() != null) {
+			getStage().hide();
+			this.onHide();
+		}
+		else
+			throw new IllegalStateException(
+					"cannot hide window when stage object is null");
+	}
+	
+	/**
+	 * Call every time when the hide() method is invoked
+	 */
+	protected void onHide() {
+		
+	}
+	
+	@Override
+	public void show() {
+		if (getStage() != null) {
+			getStage().show();
+			this.onShow();
+		}
+		else
+			throw new IllegalStateException(
+					"cannot show window when stage object is null");
+	}
+
+	/**
+	 * Call every time when the show() method is invoked 
+	 */
+	protected void onShow() {
+	}
+
+	protected Stage getStage() {
+		if (stage == null) {
+			if (getView() != null) {
+				Window w = getView().getScene().getWindow();
+				if (w instanceof Stage)
+					this.stage = (Stage) w;
+				else
+					throw new IllegalStateException(
+							"the window object is not Stage class");
+			} else
+				throw new IllegalStateException(
+						"cannot return stage object when view object is null");
+		}
+		return stage;
+	}
 
 	/**
 	 * Initialize controller after loading the view
