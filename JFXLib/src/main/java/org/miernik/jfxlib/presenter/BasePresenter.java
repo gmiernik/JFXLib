@@ -5,10 +5,15 @@
 package org.miernik.jfxlib.presenter;
 
 import java.util.ResourceBundle;
-import javafx.scene.Parent;
-import javafx.stage.Stage;
-import javafx.stage.Window;
 
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
+import javafx.event.EventHandler;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.stage.Window;
+import javafx.stage.WindowEvent;
+import org.apache.log4j.Logger;
 import org.miernik.jfxlib.Service;
 import org.miernik.jfxlib.event.EventBus;
 import org.miernik.jfxlib.event.SimpleActionEvent;
@@ -19,11 +24,57 @@ import org.miernik.jfxlib.event.SimpleActionEvent;
  */
 public abstract class BasePresenter<T extends Service> implements Presenter {
 
+	final static Logger logger = Logger.getLogger(BasePresenter.class);
+	
 	private Parent view;
 	private T service;
 	private EventBus eventBus;
 	private ResourceBundle resource;
-	private Stage stage;
+	private Window window;
+	private ChangeListener<Window> windowChangeListener = new ChangeListener<Window>() {
+		
+		@Override
+		public void changed(ObservableValue<? extends Window> arg0, Window oldValue,
+				Window newValue) {
+			logger.debug("changed Window object");
+			setWindow(newValue);
+		}
+	};
+	private ChangeListener<Scene> sceneChangeListener = new ChangeListener<Scene>() {
+		
+		@Override
+		public void changed(ObservableValue<? extends Scene> arg0, Scene oldValue,
+				Scene newValue) {
+			logger.debug("changed Scene object");
+			if (oldValue!=null)
+				oldValue.windowProperty().removeListener(windowChangeListener);
+			if (newValue!=null)
+				newValue.windowProperty().addListener(windowChangeListener);
+		}
+	};
+	private EventHandler<WindowEvent> onShowingHandler = new EventHandler<WindowEvent>() {
+		
+		@Override
+		public void handle(WindowEvent arg0) {
+			logger.debug("run OnShowing handler");			
+			onShow();
+		}
+	};
+	
+	private EventHandler<WindowEvent> onHidingHandler = new EventHandler<WindowEvent>() {
+		
+		@Override
+		public void handle(WindowEvent arg0) {
+			logger.debug("run OnHiding handler");			
+			onHide();
+		}
+	};
+	
+	protected void setWindow(Window window) {
+		this.window = window;
+		this.window.setOnShowing(onShowingHandler);
+		this.window.setOnHiding(onHidingHandler);
+	}
 
 	public void setResource(ResourceBundle resource) {
 		this.resource = resource;
@@ -50,11 +101,14 @@ public abstract class BasePresenter<T extends Service> implements Presenter {
 	}
 
 	public void setView(Parent view) {
+		logger.debug("set view object");		
 		this.view = view;
+		this.view.sceneProperty().addListener(sceneChangeListener);
 	}
 
 	@Override
 	public Parent getView() {
+		logger.debug("get view object");		
 		return this.view;
 	}
 
@@ -81,17 +135,6 @@ public abstract class BasePresenter<T extends Service> implements Presenter {
 		throw new UnsupportedOperationException("Not supported yet.");
 	}
 
-	@Override
-	public void hide() {
-		if (getStage() != null) {
-			getStage().hide();
-			this.onHide();
-		}
-		else
-			throw new IllegalStateException(
-					"cannot hide window when stage object is null");
-	}
-	
 	/**
 	 * Call every time when the hide() method is invoked
 	 */
@@ -99,42 +142,19 @@ public abstract class BasePresenter<T extends Service> implements Presenter {
 		
 	}
 	
-	@Override
-	public void show() {
-		if (getStage() != null) {
-			getStage().show();
-			this.onShow();
-		}
-		else
-			throw new IllegalStateException(
-					"cannot show window when stage object is null");
-	}
-
 	/**
 	 * Call every time when the show() method is invoked 
 	 */
 	protected void onShow() {
 	}
 
-	protected Stage getStage() {
-		if (stage == null) {
-			if (getView() != null) {
-				Window w = getView().getScene().getWindow();
-				if (w instanceof Stage)
-					this.stage = (Stage) w;
-				else
-					throw new IllegalStateException(
-							"the window object is not Stage class");
-			} else
-				throw new IllegalStateException(
-						"cannot return stage object when view object is null");
-		}
-		return stage;
+	protected Window getWindow() {
+		return window;
 	}
 
 	/**
 	 * Initialize controller after loading the view
 	 */
-	public abstract void initialize();
+	public void initialize() {};
 
 }

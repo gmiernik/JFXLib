@@ -10,7 +10,7 @@ import org.miernik.jfxexamples.presenter.MainPresenter;
 import org.miernik.jfxexamples.presenter.NewPresenter;
 import org.miernik.jfxexamples.presenter.SampleWindowPresenter;
 import org.miernik.jfxlib.MVPApplication;
-import org.miernik.jfxlib.presenter.AbstractMainPresenter;
+import org.miernik.jfxlib.presenter.MainWindowPresenter;
 
 /**
  *
@@ -24,32 +24,16 @@ public class App extends MVPApplication<ExampleService> {
         launch(args);
     }
     
-    private MainPresenter mainPresenter;
     private SampleWindowPresenter sampleWindowPresenter;
     private ExampleService service = new ExampleService();
-        
-    @Override
-    public void start(final Stage primaryStage) {
-        primaryStage.setTitle("JFX Examples");
-        getMainPresenter().setMainView(primaryStage);
-        primaryStage.show();
-    }
-
-    @Override
-    public AbstractMainPresenter<ExampleService> getMainPresenter() {
-        if (mainPresenter==null) {
-            mainPresenter = (MainPresenter) load("Main", true);
-        }
-        return mainPresenter;
-    }
-            
+                    
 	@Override
 	public ExampleService getService() {
 		return this.service;
 	}
 	
 	public void actionNewInfo() {
-		NewPresenter pres = (NewPresenter) load("New", true);
+		NewPresenter pres = loadPresenter(NewPresenter.class, "New", true);
 		pres.show();
 	}
 	
@@ -59,9 +43,14 @@ public class App extends MVPApplication<ExampleService> {
 
 	public SampleWindowPresenter getSampleWindowPresenter() {
 		if (sampleWindowPresenter==null) {
-			sampleWindowPresenter = (SampleWindowPresenter) load("SampleWindow");
+			sampleWindowPresenter = loadPresenter(SampleWindowPresenter.class, "SampleWindow");
 		}
 		return sampleWindowPresenter;
+	}
+
+	@Override
+	public MainWindowPresenter<?> initMainPresenter(Stage s) {
+		return initPresenter(new MainPresenter(s), "Main", true);
 	}
 
 }

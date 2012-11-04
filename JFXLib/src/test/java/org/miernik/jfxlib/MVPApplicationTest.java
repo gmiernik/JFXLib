@@ -8,35 +8,45 @@ import java.io.File;
 import java.net.URL;
 import java.util.Locale;
 import java.util.ResourceBundle;
-
+import javafx.application.Platform;
+import javafx.embed.swing.JFXPanel;
 import javafx.scene.Parent;
 import javafx.stage.Stage;
-import static org.junit.Assert.*;
+import org.jodah.concurrentunit.junit.ConcurrentTestCase;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.miernik.jfxlib.event.SimpleActionEvent;
-import org.miernik.jfxlib.presenter.BaseMainPresenter;
+import org.miernik.jfxlib.presenter.MainWindowPresenter;
 
 /**
  * 
  * @author Miernik
  */
-public class MVPApplicationTest {
+public class MVPApplicationTest extends ConcurrentTestCase {
 
 	public MVPApplicationTest() {
 	}
 
 	@BeforeClass
 	public static void setUpClass() throws Exception {
+		new JFXPanel();
 	}
 
 	@AfterClass
 	public static void tearDownClass() throws Exception {
 	}
 
+	class MainWindow extends MainWindowPresenter<Service> {
+
+		public MainWindow(Stage s) {
+			super(s);
+		}
+	}
+
 	class TestApp extends MVPApplication<Service> {
 		public boolean flag = false;
+		public MainWindowPresenter<Service> mainPresenter;
 
 		@Override
 		public Service getService() {
@@ -44,17 +54,15 @@ public class MVPApplicationTest {
 			};
 		}
 
-		@Override
-		public BaseMainPresenter<?> getMainPresenter() {
-			return null;
-		}
-
-		@Override
-		public void start(Stage arg0) throws Exception {
-		}
-
 		public void actionTest123() {
 			flag = true;
+		}
+
+		@Override
+		public MainWindowPresenter<?> initMainPresenter(Stage s) {
+			MainWindowPresenter<Service> p = new MainWindow(s);
+			mainPresenter = initPresenter(p, "MainView");
+			return mainPresenter;
 		}
 
 	}
@@ -75,30 +83,31 @@ public class MVPApplicationTest {
 		final String viewName = "TestView";
 		Locale.setDefault(Locale.ROOT);
 
-		URL path = app.getClass().getResource("/views/"+viewName +".fxml");
+		URL path = app.getClass().getResource("/views/" + viewName + ".fxml");
 		assertNotNull(path);
 		File file = new File(path.getFile());
 		assertTrue(file.exists());
-		
+
 		ResourceBundle resource = ResourceBundle.getBundle("views." + viewName);
 		assertNotNull(resource);
 
-		TestPresenter result = app.load(TestPresenter.class, viewName, true);
+		TestPresenter result = app.loadPresenter(TestPresenter.class, viewName,
+				true);
 		assertNotNull(result);
 		assertNotNull(result.getResource());
 	}
-	
+
 	@Test
 	public void testLoad() throws Exception {
 		final TestApp app = new TestApp();
 		final String viewName = "TestView";
 
-		URL path = app.getClass().getResource("/views/"+viewName +".fxml");
+		URL path = app.getClass().getResource("/views/" + viewName + ".fxml");
 		assertNotNull(path);
 		File file = new File(path.getFile());
 		assertTrue(file.exists());
-		
-		TestPresenter result = app.load(TestPresenter.class, viewName);
+
+		TestPresenter result = app.loadPresenter(TestPresenter.class, viewName);
 		assertNotNull(result);
 		assertEquals(TestPresenter.class, result.getClass());
 		assertNotNull(result.getView());
@@ -106,5 +115,42 @@ public class MVPApplicationTest {
 		assertNotNull(result.testLabel);
 		assertEquals("initiated", result.testLabel.getText());
 	}
-	
+
+	@Test
+	public void testInitPresenter() throws Exception {
+		final TestApp app = new TestApp();
+		final String viewName = "TestView";
+		final TestPresenter presenter = new TestPresenter();
+
+		URL path = app.getClass().getResource("/views/" + viewName + ".fxml");
+		assertNotNull(path);
+		File file = new File(path.getFile());
+		assertTrue(file.exists());
+
+		assertNull(presenter.getView());
+		app.initPresenter(presenter, viewName);
+		assertTrue(presenter.getView() instanceof Parent);
+		assertNotNull(presenter.getEventBus());
+		assertNotNull(presenter.getService());
+	}
+
+	@Test
+	public void testStart() throws Throwable {
+		Platform.runLater(new Runnable() {
+			public void run() {
+				final TestApp app = new TestApp();
+				final Stage stage = new Stage();
+
+				app.start(stage);
+				MainWindowPresenter<Service> p = app.mainPresenter;
+				threadAssertNotNull(p);
+				threadAssertTrue(stage.isShowing());
+				threadAssertEquals(stage, p.getView().getScene().getWindow());
+
+				resume();
+			}
+		});
+		threadWait(1000);
+	}
+
 }

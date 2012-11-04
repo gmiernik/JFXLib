@@ -9,31 +9,31 @@
 <?import javafx.scene.shape.*?>
 <?import javafx.scene.text.*?>
 
-<AnchorPane prefHeight="400" prefWidth="320" xmlns:fx="http://javafx.com/fxml" 
-            fx:controller="org.miernik.jfxexamples.presenter.MainPresenter" >
-    <children>
-        <MenuBar AnchorPane.topAnchor="0.0">
-            <menus>
-                <Menu text="%MenuFile">
-                    <items>
-                    	<MenuItem fx:id="menuMessage" text="%MenuMessage" />
-                    	<MenuItem fx:id="menuNew" text="%MenuNew" />
-                        <MenuItem fx:id="sampleWindow" text="%SampleWindow" />
-                        <MenuItem fx:id="menuClose" text="%MenuClose" />
-                    </items>
-                </Menu>
-                <Menu text="%MenuHelp">
-                    <items>
-                        <MenuItem fx:id="menuAbout" text="%MenuAbout" />
-                    </items>
-                </Menu>
-            </menus>
-        </MenuBar>
-        <AnchorPane fx:id="mainContent" AnchorPane.topAnchor="25.0" 
-                    AnchorPane.rightAnchor="0.0" AnchorPane.leftAnchor="0.0"
-                    AnchorPane.bottomAnchor="0.0">
-            <children>
-            </children>
-        </AnchorPane>
-    </children>
+<AnchorPane prefHeight="400" prefWidth="320"
+	xmlns:fx="http://javafx.com/fxml">
+	<children>
+		<MenuBar AnchorPane.topAnchor="0.0">
+			<menus>
+				<Menu text="%MenuFile">
+					<items>
+						<MenuItem fx:id="menuMessage" text="%MenuMessage" />
+						<MenuItem fx:id="menuNew" text="%MenuNew" />
+						<MenuItem fx:id="sampleWindow" text="%SampleWindow" />
+						<MenuItem fx:id="menuClose" text="%MenuClose" />
+					</items>
+				</Menu>
+				<Menu text="%MenuHelp">
+					<items>
+						<MenuItem fx:id="menuAbout" text="%MenuAbout" />
+					</items>
+				</Menu>
+			</menus>
+		</MenuBar>
+		<AnchorPane fx:id="mainContent" AnchorPane.topAnchor="25.0"
+			AnchorPane.rightAnchor="0.0" AnchorPane.leftAnchor="0.0"
+			AnchorPane.bottomAnchor="0.0">
+			<children>
+			</children>
+		</AnchorPane>
+	</children>
 </AnchorPane>

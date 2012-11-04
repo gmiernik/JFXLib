@@ -17,16 +17,6 @@ public interface Presenter {
      * @return 
      */
     Parent getView();
-
-    /**
-     * Show view of the presenter
-     */
-    void show();
-    
-    /**
-     * Hide view of the presenter
-     */
-    void hide();
     
     /**
      * Call to clear and remove unnecessary data

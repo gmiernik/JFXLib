@@ -10,12 +10,13 @@ import java.util.ResourceBundle;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
+import javafx.stage.Stage;
 import org.miernik.jfxlib.event.EventBus;
 import org.miernik.jfxlib.event.EventListener;
 import org.miernik.jfxlib.event.SimpleActionEvent;
 import org.miernik.jfxlib.event.SimpleEventBus;
-import org.miernik.jfxlib.presenter.BaseMainPresenter;
 import org.miernik.jfxlib.presenter.BasePresenter;
+import org.miernik.jfxlib.presenter.MainWindowPresenter;
 
 /**
  * 
@@ -28,12 +29,13 @@ public abstract class MVPApplication<S extends Service> extends Application
 
 	public EventBus getEventBus() {
 		return eventBus;
+		
 	}
 
 	public abstract S getService();
 
-	public abstract BaseMainPresenter<?> getMainPresenter();
-
+	public abstract MainWindowPresenter<?> initMainPresenter(Stage s);
+	
 	public MVPApplication() {
 		super();
 		this.eventBus = new SimpleEventBus();
@@ -57,23 +59,21 @@ public abstract class MVPApplication<S extends Service> extends Application
 		}
 	}
 
-	protected <P extends BasePresenter<S>> P load(Class<P> controllerClass,
-			String fxmlName) throws InstantiationException,
-			IllegalAccessException {
-		return load(controllerClass, fxmlName, false);
+	protected <P extends BasePresenter<S>> P loadPresenter(
+			Class<P> controllerClass, String fxmlName) {
+		return loadPresenter(controllerClass, fxmlName, false);
 	}
 
-	protected <P extends BasePresenter<S>> P load(Class<P> controllerClass,
-			String fxmlName, boolean loadResource)
-			throws InstantiationException, IllegalAccessException {
-		return load(controllerClass, fxmlName,
+	protected <P extends BasePresenter<S>> P loadPresenter(
+			Class<P> controllerClass, String fxmlName, boolean loadResource) {
+		return loadPresenter(controllerClass, fxmlName,
 				loadResource ? getResourceBundleOfView(fxmlName) : null);
 	}
 
 	/**
 	 * Load presenter and view object.
 	 * 
-	 * @param controllerClass
+	 * @param presenterClass
 	 *            presenter class
 	 * @param fxmlName
 	 *            name of view file in FXML notation
@@ -83,25 +83,60 @@ public abstract class MVPApplication<S extends Service> extends Application
 	 * @throws InstantiationException
 	 * @throws IllegalAccessException
 	 */
-	protected <P extends BasePresenter<S>> P load(Class<P> controllerClass,
+	protected <P extends BasePresenter<S>> P loadPresenter(
+			Class<P> presenterClass, String fxmlName, ResourceBundle resource) {
+		P presenter = null;
+		try {
+			presenter = presenterClass.newInstance();
+		} catch (InstantiationException | IllegalAccessException ex) {
+			throw new RuntimeException("Unable to create presenter object"
+					+ fxmlName + ", error: "
+					+ getFirstException(ex).getMessage(), ex);
+		}
+		if (presenter != null)
+			loadView(presenter, fxmlName, resource);
+		return presenter;
+	}
+	
+	protected <P extends BasePresenter<S>> P initPresenter(P presenter,
+			String fxmlName, ResourceBundle resource) {
+		if (presenter==null)
+			throw new IllegalArgumentException("Presenter object cannot be null");
+		presenter.setEventBus(getEventBus());
+		presenter.setService(getService());
+		return loadView(presenter, fxmlName, resource);
+	}
+
+	protected <P extends BasePresenter<S>> P initPresenter(P presenter,
+			String fxmlName) {
+		return initPresenter(presenter, fxmlName, false);
+	}
+
+	protected <P extends BasePresenter<S>> P initPresenter(P presenter,
+			String fxmlName, boolean loadResource) {
+		return initPresenter(presenter, fxmlName,
+				loadResource ? getResourceBundleOfView(fxmlName) : null);
+	}
+
+	private <P extends BasePresenter<S>> P loadView(P presenter,
 			String fxmlName, ResourceBundle resource) {
 		try {
-			final P controller = controllerClass.newInstance();
-			controller.setEventBus(getEventBus());
-			controller.setService(getService());
+			presenter.setEventBus(getEventBus());
+			presenter.setService(getService());
 			FXMLLoader loader = new FXMLLoader();
-			loader.setController(controller);
+			loader.setController(presenter);
 			if (resource != null) {
 				loader.setResources(resource);
-				controller.setResource(resource);
+				presenter.setResource(resource);
 			}
 			loader.load(this.getClass().getResourceAsStream(
 					"/views/" + fxmlName + ".fxml"));
-			controller.setView((Parent) loader.getRoot());
-			return controller;
+			presenter.setView((Parent) loader.getRoot());
+			return presenter;
 		} catch (Exception ex) {
-			throw new RuntimeException("Unable to load FXML: " + fxmlName
-					+ ", error: " + getFirstException(ex).getMessage(), ex);
+			throw new RuntimeException("Unable to load view from FXML: "
+					+ fxmlName + ", error: "
+					+ getFirstException(ex).getMessage(), ex);
 		}
 	}
 
@@ -111,6 +146,12 @@ public abstract class MVPApplication<S extends Service> extends Application
 
 	protected ResourceBundle getResourceBundleOfView(String fxmlName) {
 		return ResourceBundle.getBundle("views." + fxmlName);
+	}
+	
+	@Override
+	public final void start(Stage stage) {
+		initMainPresenter(stage);
+		stage.show();
 	}
 
 }
