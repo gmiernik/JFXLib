@@ -41,7 +41,7 @@ public abstract class WindowPresenter<T extends Service> extends
 	
 	@Override
 	public void setView(Parent view) {
-		getStage().setScene(new Scene(view));
 		super.setView(view);
+		getStage().setScene(new Scene(view));
 	}
 }

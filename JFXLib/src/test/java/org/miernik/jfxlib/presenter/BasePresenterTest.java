@@ -1,10 +1,7 @@
 package org.miernik.jfxlib.presenter;
 
 import javafx.application.Platform;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.embed.swing.JFXPanel;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
@@ -17,7 +14,7 @@ import org.junit.Test;
 import org.miernik.jfxlib.Service;
 
 public class BasePresenterTest extends ConcurrentTestCase {
-	
+
 	final static Logger logger = Logger.getLogger(BasePresenterTest.class);
 
 	boolean result;
@@ -48,10 +45,6 @@ public class BasePresenterTest extends ConcurrentTestCase {
 					protected void onShow() {
 						result = true;
 					}
-
-					@Override
-					public void initialize() {
-					}
 				};
 				p.setView(new AnchorPane());
 				stage.setScene(new Scene(p.getView()));
@@ -68,8 +61,8 @@ public class BasePresenterTest extends ConcurrentTestCase {
 			}
 		});
 		threadWait(1000);
-	}	
-	
+	}
+
 	@Test
 	public void testOnHide() throws Throwable {
 		Platform.runLater(new Runnable() {
@@ -82,10 +75,6 @@ public class BasePresenterTest extends ConcurrentTestCase {
 					@Override
 					protected void onHide() {
 						result = true;
-					}
-					
-					@Override
-					public void initialize() {
 					}
 				};
 				p.setView(new AnchorPane());
@@ -106,7 +95,7 @@ public class BasePresenterTest extends ConcurrentTestCase {
 		});
 		threadWait(1000);
 	}
-	
+
 	@Test
 	public void testGetWindow() throws Throwable {
 		Platform.runLater(new Runnable() {
@@ -114,12 +103,6 @@ public class BasePresenterTest extends ConcurrentTestCase {
 				logger.debug("TEST: testGetWindow");
 				final Stage stage = new Stage();
 				final BasePresenter<Service> p = new BasePresenter<Service>() {
-
-					@Override
-					public void initialize() {
-						// TODO Auto-generated method stub
-
-					}
 				};
 				p.setView(new AnchorPane());
 				stage.setScene(new Scene(p.getView()));
@@ -131,44 +114,68 @@ public class BasePresenterTest extends ConcurrentTestCase {
 		});
 		threadWait(1000);
 	}
-	
+
 	@Test
-	public void testSetParent() throws Throwable {
+	public void testGetScene() throws Throwable {
 		Platform.runLater(new Runnable() {
 			public void run() {
-				logger.debug("TEST: testSetParent");
-				final Stage stage = new Stage();
+				logger.debug("TEST: testGetScene");
 				final BasePresenter<Service> p = new BasePresenter<Service>() {
+				};
+				p.setView(new AnchorPane());
+				Scene scene = new Scene(p.getView());
 
+				threadAssertEquals(scene, p.getScene());
+
+				resume();
+			}
+		});
+		threadWait(1000);
+	}
+	
+	class TestBasePresenter extends BasePresenter<Service> {
+		public int result = 0;
+	}
+	
+	@Test
+	public void testOnInitScene() throws Throwable {
+		Platform.runLater(new Runnable() {
+			public void run() {
+				logger.debug("TEST: testOnInitScene");
+				final TestBasePresenter p = new TestBasePresenter() {
 					@Override
-					public void initialize() {
-						// TODO Auto-generated method stub
+					protected void onInitScene() {
+						super.onInitScene();
+						result++;
+					}
+				};
+				threadAssertEquals(0, p.result);
+				p.setView(new AnchorPane());
+				new Scene(p.getView());
+				threadAssertEquals(1, p.result);
 
+				resume();
+			}
+		});
+		threadWait(1000);
+	}
+	
+	@Test
+	public void testOnInitWindow() throws Throwable {
+		Platform.runLater(new Runnable() {
+			public void run() {
+				logger.debug("TEST: testOnInitWindow");
+				final Stage stage = new Stage();
+				final TestBasePresenter p = new TestBasePresenter() {
+					@Override
+					protected void onInitWindow() {
+						super.onInitWindow();
+						result++;
 					}
 				};
 				p.setView(new AnchorPane());
-				Parent parent = p.getView();
-				parent.parentProperty().addListener(new ChangeListener<Parent>() {
-
-					@Override
-					public void changed(ObservableValue<? extends Parent> arg0,
-							Parent arg1, Parent arg2) {
-						logger.debug("parent was changed");
-					}
-				});
-				parent.sceneProperty().addListener(new ChangeListener<Scene>() {
-
-					@Override
-					public void changed(ObservableValue<? extends Scene> arg0,
-							Scene arg1, Scene arg2) {
-						logger.debug("scene was changed");
-					}
-				});
 				stage.setScene(new Scene(p.getView()));
-				//TODO: prepare universal method for show/hide window with listener invoking onShow/onHide methods
-				
-				
-				threadAssertEquals(stage, p.getWindow());
+				threadAssertEquals(1, p.result);
 
 				resume();
 			}

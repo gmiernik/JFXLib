@@ -3,17 +3,22 @@ package org.miernik.jfxlib.presenter;
 import javafx.application.Platform;
 import javafx.embed.swing.JFXPanel;
 import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
+import org.apache.log4j.Logger;
 import org.jodah.concurrentunit.junit.ConcurrentTestCase;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.miernik.jfxlib.Service;
+import org.miernik.jfxlib.presenter.BasePresenterTest.TestBasePresenter;
 
 public class WindowPresenterTest extends ConcurrentTestCase {
 
+	final static Logger logger = Logger.getLogger(WindowPresenterTest.class);
+	
 	@BeforeClass
 	public static void initJFX() throws Exception {
 		new JFXPanel();
@@ -95,6 +100,32 @@ public class WindowPresenterTest extends ConcurrentTestCase {
 				threadAssertNotNull(p.getStage());
 				threadAssertFalse(p.getStage().isShowing());
 				
+				resume();
+			}
+		});
+		threadWait(1000);
+	}
+
+	class TestWindowPresenter extends WindowPresenter<Service> {
+		public int result = 0;
+	}
+	
+	@Test
+	public void testOnInitScene() throws Throwable {
+		Platform.runLater(new Runnable() {
+			public void run() {
+				logger.debug("TEST: testOnInitScene");
+				final TestWindowPresenter p = new TestWindowPresenter() {
+					@Override
+					protected void onInitScene() {
+						super.onInitScene();
+						result++;
+					}
+				};
+				threadAssertEquals(0, p.result);
+				p.setView(new AnchorPane());
+				threadAssertEquals(1, p.result);
+
 				resume();
 			}
 		});

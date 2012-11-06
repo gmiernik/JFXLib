@@ -25,55 +25,74 @@ import org.miernik.jfxlib.event.SimpleActionEvent;
 public abstract class BasePresenter<T extends Service> implements Presenter {
 
 	final static Logger logger = Logger.getLogger(BasePresenter.class);
-	
+
 	private Parent view;
 	private T service;
 	private EventBus eventBus;
 	private ResourceBundle resource;
 	private Window window;
+	private Scene scene;
 	private ChangeListener<Window> windowChangeListener = new ChangeListener<Window>() {
-		
+
 		@Override
-		public void changed(ObservableValue<? extends Window> arg0, Window oldValue,
-				Window newValue) {
+		public void changed(ObservableValue<? extends Window> arg0,
+				Window oldValue, Window newValue) {
 			logger.debug("changed Window object");
 			setWindow(newValue);
 		}
 	};
 	private ChangeListener<Scene> sceneChangeListener = new ChangeListener<Scene>() {
-		
+
 		@Override
-		public void changed(ObservableValue<? extends Scene> arg0, Scene oldValue,
-				Scene newValue) {
+		public void changed(ObservableValue<? extends Scene> arg0,
+				Scene oldValue, Scene newValue) {
 			logger.debug("changed Scene object");
-			if (oldValue!=null)
-				oldValue.windowProperty().removeListener(windowChangeListener);
-			if (newValue!=null)
-				newValue.windowProperty().addListener(windowChangeListener);
+			setScene(newValue);
 		}
 	};
 	private EventHandler<WindowEvent> onShowingHandler = new EventHandler<WindowEvent>() {
-		
+
 		@Override
 		public void handle(WindowEvent arg0) {
-			logger.debug("run OnShowing handler");			
+			logger.debug("run OnShowing handler");
 			onShow();
 		}
 	};
-	
+
 	private EventHandler<WindowEvent> onHidingHandler = new EventHandler<WindowEvent>() {
-		
+
 		@Override
 		public void handle(WindowEvent arg0) {
-			logger.debug("run OnHiding handler");			
+			logger.debug("run OnHiding handler");
 			onHide();
 		}
 	};
-	
-	protected void setWindow(Window window) {
-		this.window = window;
-		this.window.setOnShowing(onShowingHandler);
-		this.window.setOnHiding(onHidingHandler);
+
+	protected void setWindow(Window newWindow) {
+		if (this.window != newWindow) {
+			if (this.window!=null) {
+				this.window.setOnShowing(null);
+				this.window.setOnHiding(null);				
+			}
+			if (newWindow != null) {
+				newWindow.setOnShowing(onShowingHandler);
+				newWindow.setOnHiding(onHidingHandler);
+			}
+			this.window = newWindow;
+			onInitWindow();
+		}
+	}
+
+	protected void setScene(Scene newScene) {
+		if (this.scene != newScene) {
+			if (this.scene != null)
+				this.scene.windowProperty()
+						.removeListener(windowChangeListener);
+			if (newScene != null)
+				newScene.windowProperty().addListener(windowChangeListener);
+			this.scene = newScene;
+			onInitScene();
+		}
 	}
 
 	public void setResource(ResourceBundle resource) {
@@ -101,14 +120,14 @@ public abstract class BasePresenter<T extends Service> implements Presenter {
 	}
 
 	public void setView(Parent view) {
-		logger.debug("set view object");		
+		logger.debug("set view object");
 		this.view = view;
 		this.view.sceneProperty().addListener(sceneChangeListener);
 	}
 
 	@Override
 	public Parent getView() {
-		logger.debug("get view object");		
+		logger.debug("get view object");
 		return this.view;
 	}
 
@@ -139,11 +158,11 @@ public abstract class BasePresenter<T extends Service> implements Presenter {
 	 * Call every time when the hide() method is invoked
 	 */
 	protected void onHide() {
-		
+
 	}
-	
+
 	/**
-	 * Call every time when the show() method is invoked 
+	 * Call every time when the show() method is invoked
 	 */
 	protected void onShow() {
 	}
@@ -151,10 +170,26 @@ public abstract class BasePresenter<T extends Service> implements Presenter {
 	protected Window getWindow() {
 		return window;
 	}
+	
+	public Scene getScene() {
+		return scene;
+	}
 
 	/**
 	 * Initialize controller after loading the view
 	 */
-	public void initialize() {};
+	public void initialize() {
+	};
 
+	/**
+	 * Invoke when scene object is connected to view
+	 */
+	protected void onInitScene() {
+	}
+
+	/**
+	 * Invoke when window object is connected to view
+	 */
+	protected void onInitWindow() {
+	}
 }
