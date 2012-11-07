@@ -20,7 +20,7 @@ public class TestPresenter extends BasePresenter<Service> {
 	protected Label testLabel;
 	
 	@Override
-	public void initialize() {
+	public void onInit() {
 		testLabel.setText("initiated");
 		if (getEventBus()==null)
 			throw new IllegalStateException("EventBus object cannot be NULL");

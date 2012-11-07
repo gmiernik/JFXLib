@@ -38,7 +38,8 @@ public class MainPresenter extends MainWindowPresenter<ExampleService> {
 
     
 	@Override
-	public void initialize() {
+	public void onInit() {
+		getStage().setTitle(getResource().getString("windowTitle"));
     	sampleWindow.setOnAction(new EventHandler<ActionEvent>() {
 			
 			@Override

@@ -12,7 +12,7 @@ public class NewPresenter extends ModalWindowPresenter<ExampleService> {
 	@FXML private Button buttonOk;
 	
 	@Override
-	public void initialize() {
+	public void onInit() {
 		buttonOk.setOnAction(new EventHandler<ActionEvent>() {
 			
 			@Override

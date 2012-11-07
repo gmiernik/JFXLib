@@ -2,6 +2,7 @@ package org.miernik.jfxlib.presenter;
 
 import javafx.application.Platform;
 import javafx.embed.swing.JFXPanel;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
@@ -135,51 +136,146 @@ public class BasePresenterTest extends ConcurrentTestCase {
 	
 	class TestBasePresenter extends BasePresenter<Service> {
 		public int result = 0;
-	}
-	
-	@Test
-	public void testOnInitScene() throws Throwable {
-		Platform.runLater(new Runnable() {
-			public void run() {
-				logger.debug("TEST: testOnInitScene");
-				final TestBasePresenter p = new TestBasePresenter() {
-					@Override
-					protected void onInitScene() {
-						super.onInitScene();
-						result++;
-					}
-				};
-				threadAssertEquals(0, p.result);
-				p.setView(new AnchorPane());
-				new Scene(p.getView());
-				threadAssertEquals(1, p.result);
+	}	
 
-				resume();
-			}
-		});
-		threadWait(1000);
-	}
-	
 	@Test
-	public void testOnInitWindow() throws Throwable {
+	public void testOnInit() throws Throwable {
 		Platform.runLater(new Runnable() {
 			public void run() {
-				logger.debug("TEST: testOnInitWindow");
+				logger.debug("TEST: testOnInit");
 				final Stage stage = new Stage();
 				final TestBasePresenter p = new TestBasePresenter() {
 					@Override
-					protected void onInitWindow() {
-						super.onInitWindow();
+					protected void onInit() {
 						result++;
+						threadAssertNotNull(getWindow());
+						threadAssertNotNull(getScene());
+						threadAssertNotNull(getView());
 					}
 				};
-				p.setView(new AnchorPane());
+				threadAssertEquals(0, p.result);
+				Parent view = new AnchorPane(); 
+				p.setView(view);
 				stage.setScene(new Scene(p.getView()));
+				p.setView(view);
 				threadAssertEquals(1, p.result);
+				
 
 				resume();
 			}
 		});
 		threadWait(1000);
+	}
+	
+	@Test
+	public void testOnInitSubView() throws Throwable {
+		Platform.runLater(new Runnable() {
+			public void run() {
+				logger.debug("TEST: testOnInitSubView");
+				final Stage stage = new Stage();
+				final TestBasePresenter p = new TestBasePresenter() {
+					@Override
+					protected void onInit() {
+						result++;
+					}
+				};
+				AnchorPane view = new AnchorPane();
+				p.setView(view);
+				stage.setScene(new Scene(p.getView()));
+				final TestBasePresenter p2 = new TestBasePresenter() {
+					@Override
+					protected void onInit() {
+						result++;
+					}
+				};
+				threadAssertEquals(0, p2.result);
+				p2.setView(new AnchorPane());
+				view.getChildren().add(p2.getView());
+				threadAssertEquals(1, p2.result);
+
+				resume();
+			}
+		});
+		threadWait(1000);
+	}
+
+	@Test
+	public void testOnInitSubViewExchange() throws Throwable {
+		Platform.runLater(new Runnable() {
+			public void run() {
+				logger.debug("TEST: testOnInitSubViewExchange");
+				final Stage stage = new Stage();
+				final TestBasePresenter p = new TestBasePresenter() {
+					@Override
+					protected void onInit() {
+						result++;
+					}
+				};
+				AnchorPane view = new AnchorPane();
+				p.setView(view);
+				stage.setScene(new Scene(p.getView()));
+				final TestBasePresenter p2 = new TestBasePresenter() {
+					@Override
+					protected void onInit() {
+						logger.debug("exec onInit - p2");
+						result++;
+					}
+				};
+				p2.setView(new AnchorPane());
+				final TestBasePresenter p3 = new TestBasePresenter() {
+					@Override
+					protected void onInit() {
+						logger.debug("exec onInit - p3");
+						result++;
+					}
+				};
+				p3.setView(new AnchorPane());
+				threadAssertEquals(0, p2.result);
+				view.getChildren().add(p2.getView());
+				threadAssertEquals(1, p2.result);
+				
+				threadAssertEquals(0, p3.result);
+				view.getChildren().clear();
+				view.getChildren().add(p3.getView());
+				threadAssertEquals(1, p3.result);
+
+				view.getChildren().clear();
+				view.getChildren().add(p2.getView());
+				threadAssertEquals(1, p2.result);
+
+				view.getChildren().clear();
+				view.getChildren().add(p3.getView());
+				threadAssertEquals(1, p3.result);
+
+				resume();
+			}
+		});
+		threadWait(1000);
+	}
+	
+	@Test
+	public void testCheckOnInit() throws Throwable {
+		Platform.runLater(new Runnable() {
+			public void run() {
+				logger.debug("TEST: testCheckOnInit");
+				AnchorPane view = new AnchorPane();
+				final TestBasePresenter p = new TestBasePresenter() {
+					@Override
+					protected void onInit() {
+						result++;
+					}
+				};
+				p.setView(view);
+				threadAssertEquals(0, p.result);
+				p.setWindow(null);
+				p.setScene(null);
+				threadAssertEquals(0, p.result);
+				p.checkOnInit();
+				threadAssertEquals(0, p.result);
+
+				resume();
+			}
+		});
+		threadWait(1000);		
 	}
 }

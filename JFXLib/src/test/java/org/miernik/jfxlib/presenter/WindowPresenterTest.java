@@ -3,17 +3,14 @@ package org.miernik.jfxlib.presenter;
 import javafx.application.Platform;
 import javafx.embed.swing.JFXPanel;
 import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-
 import org.apache.log4j.Logger;
 import org.jodah.concurrentunit.junit.ConcurrentTestCase;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.miernik.jfxlib.Service;
-import org.miernik.jfxlib.presenter.BasePresenterTest.TestBasePresenter;
 
 public class WindowPresenterTest extends ConcurrentTestCase {
 
@@ -111,14 +108,13 @@ public class WindowPresenterTest extends ConcurrentTestCase {
 	}
 	
 	@Test
-	public void testOnInitScene() throws Throwable {
+	public void testOnInit() throws Throwable {
 		Platform.runLater(new Runnable() {
 			public void run() {
-				logger.debug("TEST: testOnInitScene");
+				logger.debug("TEST: testOnInit");
 				final TestWindowPresenter p = new TestWindowPresenter() {
 					@Override
-					protected void onInitScene() {
-						super.onInitScene();
+					protected void onInit() {
 						result++;
 					}
 				};

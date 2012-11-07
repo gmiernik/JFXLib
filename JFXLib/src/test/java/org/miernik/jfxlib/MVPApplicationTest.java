@@ -11,6 +11,7 @@ import java.util.ResourceBundle;
 import javafx.application.Platform;
 import javafx.embed.swing.JFXPanel;
 import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.stage.Stage;
 import org.jodah.concurrentunit.junit.ConcurrentTestCase;
 import org.junit.AfterClass;
@@ -98,22 +99,34 @@ public class MVPApplicationTest extends ConcurrentTestCase {
 	}
 
 	@Test
-	public void testLoad() throws Exception {
+	public void testLoad() throws Throwable {
 		final TestApp app = new TestApp();
 		final String viewName = "TestView";
 
 		URL path = app.getClass().getResource("/views/" + viewName + ".fxml");
+		
 		assertNotNull(path);
 		File file = new File(path.getFile());
 		assertTrue(file.exists());
 
-		TestPresenter result = app.loadPresenter(TestPresenter.class, viewName);
-		assertNotNull(result);
-		assertEquals(TestPresenter.class, result.getClass());
-		assertNotNull(result.getView());
-		assertTrue(result.getView() instanceof Parent);
-		assertNotNull(result.testLabel);
-		assertEquals("initiated", result.testLabel.getText());
+		Platform.runLater(new Runnable() {
+			public void run() {
+				Stage stage = new Stage();
+				TestPresenter result = app.loadPresenter(TestPresenter.class, viewName);
+				threadAssertNotNull(result);
+				threadAssertEquals(TestPresenter.class, result.getClass());
+				threadAssertNotNull(result.getView());
+
+				stage.setScene(new Scene(result.getView()));
+				threadAssertTrue(result.getView() instanceof Parent);
+				
+				assertNotNull(result.testLabel);
+				assertEquals("initiated", result.testLabel.getText());
+
+				resume();
+			}
+		});
+		threadWait(1000);
 	}
 
 	@Test

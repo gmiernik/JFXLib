@@ -32,6 +32,7 @@ public abstract class BasePresenter<T extends Service> implements Presenter {
 	private ResourceBundle resource;
 	private Window window;
 	private Scene scene;
+	private boolean initiated = false;
 	private ChangeListener<Window> windowChangeListener = new ChangeListener<Window>() {
 
 		@Override
@@ -70,16 +71,16 @@ public abstract class BasePresenter<T extends Service> implements Presenter {
 
 	protected void setWindow(Window newWindow) {
 		if (this.window != newWindow) {
-			if (this.window!=null) {
+			if (this.window != null) {
 				this.window.setOnShowing(null);
-				this.window.setOnHiding(null);				
+				this.window.setOnHiding(null);
 			}
 			if (newWindow != null) {
 				newWindow.setOnShowing(onShowingHandler);
 				newWindow.setOnHiding(onHidingHandler);
 			}
 			this.window = newWindow;
-			onInitWindow();
+			checkOnInit();
 		}
 	}
 
@@ -91,7 +92,13 @@ public abstract class BasePresenter<T extends Service> implements Presenter {
 			if (newScene != null)
 				newScene.windowProperty().addListener(windowChangeListener);
 			this.scene = newScene;
-			onInitScene();
+			if (this.scene != null) {
+				if (this.scene.getWindow() != null)
+					setWindow(this.scene.getWindow());
+				else
+					checkOnInit();
+			} else
+				setWindow(null);
 		}
 	}
 
@@ -120,9 +127,12 @@ public abstract class BasePresenter<T extends Service> implements Presenter {
 	}
 
 	public void setView(Parent view) {
-		logger.debug("set view object");
-		this.view = view;
-		this.view.sceneProperty().addListener(sceneChangeListener);
+		if (this.view != view) {
+			logger.debug("set view object");
+			this.view = view;
+			this.view.sceneProperty().addListener(sceneChangeListener);
+			checkOnInit();
+		}
 	}
 
 	@Override
@@ -170,26 +180,22 @@ public abstract class BasePresenter<T extends Service> implements Presenter {
 	protected Window getWindow() {
 		return window;
 	}
-	
+
 	public Scene getScene() {
 		return scene;
 	}
 
-	/**
-	 * Initialize controller after loading the view
-	 */
-	public void initialize() {
-	};
-
-	/**
-	 * Invoke when scene object is connected to view
-	 */
-	protected void onInitScene() {
+	void checkOnInit() {
+		if (window != null && scene != null && view != null
+				&& initiated == false) {
+			onInit();
+			initiated = true;
+		}
 	}
 
 	/**
-	 * Invoke when window object is connected to view
+	 * Invoke after initialize window, scene and view objects
 	 */
-	protected void onInitWindow() {
+	protected void onInit() {
 	}
 }
