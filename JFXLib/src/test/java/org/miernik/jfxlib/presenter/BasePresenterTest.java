@@ -65,6 +65,39 @@ public class BasePresenterTest extends ConcurrentTestCase {
 	}
 
 	@Test
+	public void testOnShow2() throws Throwable {
+		Platform.runLater(new Runnable() {
+			public void run() {
+				logger.debug("TEST: testOnShow2");
+				result = false;
+				final Stage stage = new Stage();
+				final BasePresenter<Service> p = new BasePresenter<Service>() {
+				};
+				AnchorPane view = new AnchorPane();
+				p.setView(view);
+				stage.setScene(new Scene(p.getView()));
+				stage.show();
+				threadAssertTrue(stage.isShowing());
+				threadAssertFalse(result);
+				
+				final BasePresenter<Service> p2 = new BasePresenter<Service>() {
+
+					@Override
+					protected void onShow() {
+						result = true;
+					}
+				};
+				p2.setView(new AnchorPane());
+				view.getChildren().add(p2.getView());
+				threadAssertTrue(result);
+
+				resume();
+			}
+		});
+		threadWait(1000);
+	}
+
+	@Test
 	public void testOnHide() throws Throwable {
 		Platform.runLater(new Runnable() {
 			public void run() {

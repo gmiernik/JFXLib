@@ -189,6 +189,8 @@ public abstract class BasePresenter<T extends Service> implements Presenter {
 		if (window != null && scene != null && view != null
 				&& initiated == false) {
 			onInit();
+			if (window.isShowing())
+				onShow();
 			initiated = true;
 		}
 	}
