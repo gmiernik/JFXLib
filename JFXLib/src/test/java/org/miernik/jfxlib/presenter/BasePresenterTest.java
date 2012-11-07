@@ -311,4 +311,75 @@ public class BasePresenterTest extends ConcurrentTestCase {
 		});
 		threadWait(1000);		
 	}
+
+	@Test
+	public void testOnShowSubView() throws Throwable {
+		Platform.runLater(new Runnable() {
+			public void run() {
+				logger.debug("TEST: testOnShowMoreViews");
+				final Stage stage = new Stage();
+				final TestBasePresenter p = new TestBasePresenter() {
+					@Override
+					protected void onShow() {
+						result++;
+					}
+				};
+				AnchorPane view = new AnchorPane();
+				p.setView(view);
+				stage.setScene(new Scene(p.getView()));
+				final TestBasePresenter p2 = new TestBasePresenter() {
+					@Override
+					protected void onShow() {
+						result++;
+					}
+				};
+				p2.setView(new AnchorPane());
+				view.getChildren().add(p2.getView());
+				threadAssertEquals(0, p.result);
+				threadAssertEquals(0, p2.result);
+				stage.show();
+				threadAssertEquals(1, p.result);
+				threadAssertEquals(1, p2.result);
+
+				resume();
+			}
+		});
+		threadWait(1000);
+	}
+
+	@Test
+	public void testOnHideSubView() throws Throwable {
+		Platform.runLater(new Runnable() {
+			public void run() {
+				logger.debug("TEST: testOnHideSubView");
+				final Stage stage = new Stage();
+				final TestBasePresenter p = new TestBasePresenter() {
+					@Override
+					protected void onHide() {
+						result++;
+					}
+				};
+				AnchorPane view = new AnchorPane();
+				p.setView(view);
+				stage.setScene(new Scene(p.getView()));
+				final TestBasePresenter p2 = new TestBasePresenter() {
+					@Override
+					protected void onHide() {
+						result++;
+					}
+				};
+				p2.setView(new AnchorPane());
+				view.getChildren().add(p2.getView());
+				threadAssertEquals(0, p.result);
+				threadAssertEquals(0, p2.result);
+				stage.show();
+				stage.hide();
+				threadAssertEquals(1, p.result);
+				threadAssertEquals(1, p2.result);
+
+				resume();
+			}
+		});
+		threadWait(1000);
+	}
 }

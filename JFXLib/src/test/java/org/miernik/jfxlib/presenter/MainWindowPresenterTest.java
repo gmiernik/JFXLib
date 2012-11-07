@@ -3,26 +3,18 @@ package org.miernik.jfxlib.presenter;
 import javafx.application.Platform;
 import javafx.embed.swing.JFXPanel;
 import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import org.apache.log4j.Logger;
 import org.jodah.concurrentunit.junit.ConcurrentTestCase;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.miernik.jfxlib.Service;
 
-public class WindowPresenterTest extends ConcurrentTestCase {
+public class MainWindowPresenterTest extends ConcurrentTestCase {
 
-	final static Logger logger = Logger.getLogger(WindowPresenterTest.class);
-	private boolean result;
-	
-	@Before
-	public void setUp() {
-		result = false;
-	}
+	final static Logger logger = Logger.getLogger(MainWindowPresenterTest.class);
 	
 	@BeforeClass
 	public static void initJFX() throws Exception {
@@ -34,7 +26,7 @@ public class WindowPresenterTest extends ConcurrentTestCase {
 		Platform.runLater(new Runnable() {
 			public void run() {
 				final Stage stage = new Stage();
-				final WindowPresenter<Service> p = new WindowPresenter<Service>(stage) {
+				final MainWindowPresenter<Service> p = new MainWindowPresenter<Service>(stage) {
 
 				};
 				p.setView(new AnchorPane());
@@ -55,7 +47,8 @@ public class WindowPresenterTest extends ConcurrentTestCase {
 		Platform.runLater(new Runnable() {
 			public void run() {
 				final Parent view = new AnchorPane();
-				final WindowPresenter<Service> p = new WindowPresenter<Service>() {
+				final Stage stage = new Stage();				
+				final MainWindowPresenter<Service> p = new MainWindowPresenter<Service>(stage) {
 
 				};
 				p.setView(view);
@@ -75,8 +68,8 @@ public class WindowPresenterTest extends ConcurrentTestCase {
 	public void testShow() throws Throwable {
 		Platform.runLater(new Runnable() {
 			public void run() {
-				final WindowPresenter<Service> p = new WindowPresenter<Service>() {
-
+				final Stage stage = new Stage();
+				final MainWindowPresenter<Service> p = new MainWindowPresenter<Service>(stage) {
 				};
 				p.setView(new AnchorPane());
 
@@ -94,7 +87,8 @@ public class WindowPresenterTest extends ConcurrentTestCase {
 	public void testHide() throws Throwable {
 		Platform.runLater(new Runnable() {
 			public void run() {
-				final WindowPresenter<Service> p = new WindowPresenter<Service>() {
+				final Stage stage = new Stage();
+				final MainWindowPresenter<Service> p = new MainWindowPresenter<Service>(stage) {
 
 				};
 				p.setView(new AnchorPane());
@@ -111,7 +105,11 @@ public class WindowPresenterTest extends ConcurrentTestCase {
 		threadWait(1000);
 	}
 
-	class TestWindowPresenter extends WindowPresenter<Service> {
+	class TestMainWindowPresenter extends MainWindowPresenter<Service> {
+		public TestMainWindowPresenter(Stage s) {
+			super(s);
+		}
+
 		public int result = 0;
 	}
 	
@@ -120,7 +118,8 @@ public class WindowPresenterTest extends ConcurrentTestCase {
 		Platform.runLater(new Runnable() {
 			public void run() {
 				logger.debug("TEST: testOnInit");
-				final TestWindowPresenter p = new TestWindowPresenter() {
+				final Stage stage = new Stage();
+				final TestMainWindowPresenter p = new TestMainWindowPresenter(stage) {
 					@Override
 					protected void onInit() {
 						result++;
@@ -141,27 +140,30 @@ public class WindowPresenterTest extends ConcurrentTestCase {
 		Platform.runLater(new Runnable() {
 			public void run() {
 				logger.debug("TEST: testOnShow");
-				final WindowPresenter<Service> p = new WindowPresenter<Service>() {
+				final Stage stage = new Stage();
+				final TestMainWindowPresenter p = new TestMainWindowPresenter(stage) {
 
 					@Override
 					protected void onShow() {
-						result = true;
+						result++;
 					}
 				};
 				p.setView(new AnchorPane());
 
-				threadAssertFalse(p.getStage().isShowing());
-				threadAssertFalse(result);
+				threadAssertFalse(stage.isShowing());
+				threadAssertEquals(0, p.result);
 
 				p.show();
-				threadAssertTrue(p.getStage().isShowing());
-				threadAssertTrue(result);
+				threadAssertTrue(stage.isShowing());
+				threadAssertEquals(1, p.result);
+				
+				p.hide();
+				p.show();
+				threadAssertEquals(2, p.result);
 
 				resume();
 			}
 		});
 		threadWait(1000);
 	}
-
-	
 }

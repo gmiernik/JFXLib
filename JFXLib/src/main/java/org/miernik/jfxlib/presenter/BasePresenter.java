@@ -72,12 +72,12 @@ public abstract class BasePresenter<T extends Service> implements Presenter {
 	protected void setWindow(Window newWindow) {
 		if (this.window != newWindow) {
 			if (this.window != null) {
-				this.window.setOnShowing(null);
-				this.window.setOnHiding(null);
+				this.window.removeEventHandler(WindowEvent.WINDOW_SHOWING, onShowingHandler);
+				this.window.removeEventHandler(WindowEvent.WINDOW_HIDING, onHidingHandler);
 			}
 			if (newWindow != null) {
-				newWindow.setOnShowing(onShowingHandler);
-				newWindow.setOnHiding(onHidingHandler);
+				newWindow.addEventHandler(WindowEvent.WINDOW_SHOWING, onShowingHandler);
+				newWindow.addEventHandler(WindowEvent.WINDOW_HIDING, onHidingHandler);
 			}
 			this.window = newWindow;
 			checkOnInit();
