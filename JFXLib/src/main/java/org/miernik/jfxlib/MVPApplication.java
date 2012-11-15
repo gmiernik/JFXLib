@@ -34,7 +34,7 @@ public abstract class MVPApplication<S extends Service> extends Application
 
 	public abstract S getService();
 
-	public abstract MainWindowPresenter<?> initMainPresenter(Stage s);
+	public abstract MainWindowPresenter<S> initMainPresenter(Stage s);
 	
 	public MVPApplication() {
 		super();

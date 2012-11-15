@@ -60,12 +60,12 @@ public class MVPApplicationTest extends ConcurrentTestCase {
 		}
 
 		@Override
-		public MainWindowPresenter<?> initMainPresenter(Stage s) {
+		public MainWindowPresenter<Service> initMainPresenter(Stage s) {
 			MainWindowPresenter<Service> p = new MainWindow(s);
 			mainPresenter = initPresenter(p, "MainView");
 			return mainPresenter;
 		}
-
+		
 	}
 
 	@Test
